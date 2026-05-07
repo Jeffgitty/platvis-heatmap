@@ -4,12 +4,12 @@ import time
 from contextlib import asynccontextmanager
 from datetime import datetime
 
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
 
 from models.data_fetchers import fetch_tide, fetch_weather
 from models.fish_score import calculate_fish_score, get_score_explanation
-from models.grid import generate_coastal_grid
+from models.grid import distance_to_coast, estimate_depth, generate_coastal_grid
 from models.kriging import run_kriging, scores_to_png
 
 logging.basicConfig(level=logging.INFO)
@@ -107,3 +107,39 @@ async def get_heatmap():
     _cache = {"data": result, "ts": now}
     log.info(f"Heatmap klaar in {time.time() - t0:.1f}s | beste score: {result['best_score']}")
     return result
+
+
+@app.get("/score")
+async def get_score(
+    lat: float = Query(..., ge=50.0, le=54.5),
+    lon: float = Query(..., ge=2.0, le=8.0),
+):
+    """Bereken viskans voor één aangeklikte locatie."""
+    dist_km = distance_to_coast(lat, lon)
+
+    if dist_km > 60:
+        raise HTTPException(status_code=400, detail="Locatie te ver van de Nederlandse kust")
+
+    depth_m = estimate_depth(dist_km)
+    dt = datetime.utcnow()
+
+    # Hergebruik gecachte weer/getij indien beschikbaar
+    if _cache["data"]:
+        tide = _cache["data"]["tide"]
+        weather = _cache["data"]["weather"]
+    else:
+        weather, tide = await asyncio.gather(fetch_weather(lat, lon), fetch_tide())
+
+    score = calculate_fish_score(depth_m, dist_km, tide, weather, dt)
+    explanation = get_score_explanation(score, {"depth_m": depth_m}, tide, weather)
+
+    return {
+        "lat": round(lat, 4),
+        "lon": round(lon, 4),
+        "score": round(score, 1),
+        "depth_m": round(depth_m, 1),
+        "dist_km": round(dist_km, 1),
+        "explanation": explanation,
+        "tide": tide,
+        "weather": weather,
+    }

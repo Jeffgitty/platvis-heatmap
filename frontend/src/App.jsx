@@ -10,7 +10,7 @@ export default function App() {
   return (
     <div className="app">
       <div className="map-container">
-        <Map heatmapData={data} />
+        <Map heatmapData={data} apiUrl={API_URL} />
       </div>
       <div className="panel-container">
         <AdviesPanel data={data} loading={loading} offline={offline} />
