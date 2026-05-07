@@ -1,0 +1,13 @@
+services:
+  - type: web
+    name: platvis-api
+    env: python
+    region: frankfurt  # dichtstbij NL
+    rootDir: backend
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn main:app --host 0.0.0.0 --port $PORT
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.0
+    # Gratis tier: slaapt na 15 min inactiviteit
+    # Upgrade naar $7/mnd voor always-on

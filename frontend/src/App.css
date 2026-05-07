@@ -1,0 +1,215 @@
+/* ── Basis reset ─────────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg-dark:    #0f172a;
+  --bg-panel:   #1e293b;
+  --bg-card:    #263449;
+  --border:     #334155;
+  --text:       #e2e8f0;
+  --muted:      #94a3b8;
+  --green:      #22c55e;
+  --yellow:     #eab308;
+  --red:        #ef4444;
+  --accent:     #38bdf8;
+}
+
+html, body, #root {
+  height: 100%;
+  width: 100%;
+  background: var(--bg-dark);
+  color: var(--text);
+  font-family: system-ui, -apple-system, sans-serif;
+  font-size: 14px;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ── Layout: mobile-first (kolom) ───────────────────────────── */
+.app {
+  display: flex;
+  flex-direction: column;
+  height: 100dvh;
+  width: 100%;
+  overflow: hidden;
+}
+
+.map-container {
+  flex: 0 0 55dvh;
+  position: relative;
+}
+
+.panel-container {
+  flex: 1;
+  overflow-y: auto;
+  background: var(--bg-panel);
+  border-top: 2px solid var(--border);
+}
+
+/* ── Desktop: rij-layout ─────────────────────────────────────── */
+@media (min-width: 768px) {
+  .app { flex-direction: row; }
+  .map-container { flex: 0 0 68%; height: 100dvh; }
+  .panel-container { flex: 1; border-top: none; border-left: 2px solid var(--border); }
+}
+
+/* ── Kaart: legenda overlay ──────────────────────────────────── */
+.map-legend {
+  position: absolute;
+  bottom: 36px;
+  right: 10px;
+  background: rgba(15, 23, 42, 0.88);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 8px 10px;
+  z-index: 10;
+  min-width: 110px;
+}
+
+.legend-title {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 5px;
+  letter-spacing: 0.05em;
+}
+
+.legend-bar {
+  height: 10px;
+  border-radius: 4px;
+  background: linear-gradient(to right, #e33, #ee0, #2d2);
+  margin-bottom: 4px;
+}
+
+.legend-labels {
+  display: flex;
+  justify-content: space-between;
+  font-size: 10px;
+  color: var(--muted);
+}
+
+/* ── Panel ───────────────────────────────────────────────────── */
+.panel {
+  padding: 14px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.offline-badge {
+  background: #7f1d1d;
+  color: #fca5a5;
+  border-radius: 6px;
+  padding: 6px 10px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.panel-header {
+  font-size: 15px;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  color: var(--accent);
+  text-transform: uppercase;
+}
+
+/* ── Score display ───────────────────────────────────────────── */
+.score-display {
+  display: flex;
+  align-items: baseline;
+  gap: 3px;
+  font-weight: 800;
+}
+
+.score-number {
+  font-size: 48px;
+  line-height: 1;
+}
+
+.score-max {
+  font-size: 20px;
+  color: var(--muted);
+}
+
+.score-goed  .score-number { color: var(--green); }
+.score-matig .score-number { color: var(--yellow); }
+.score-slecht .score-number { color: var(--red); }
+
+/* ── Score balk ──────────────────────────────────────────────── */
+.score-meter-wrap { padding: 0; }
+
+.score-meter-bar {
+  height: 8px;
+  background: var(--bg-card);
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.score-meter-fill {
+  height: 100%;
+  background: linear-gradient(to right, #ef4444, #eab308, #22c55e);
+  border-radius: 999px;
+  transition: width 0.6s ease;
+}
+
+/* ── Data rijen ──────────────────────────────────────────────── */
+.panel-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  background: var(--bg-card);
+  border-radius: 10px;
+  padding: 10px 12px;
+}
+
+.panel-row {
+  display: grid;
+  grid-template-columns: 22px 1fr auto;
+  gap: 6px;
+  align-items: center;
+  font-size: 13px;
+}
+
+.row-icon { text-align: center; }
+.row-label { color: var(--muted); }
+.row-value { font-weight: 600; text-align: right; }
+
+/* ── Uitleg tekst ────────────────────────────────────────────── */
+.panel-explain {
+  font-size: 12px;
+  color: var(--muted);
+  border-top: 1px solid var(--border);
+  padding-top: 8px;
+  line-height: 1.5;
+}
+
+.panel-footer {
+  font-size: 11px;
+  color: var(--border);
+  text-align: right;
+}
+
+/* ── Skeleton loader ─────────────────────────────────────────── */
+.skeleton-block {
+  background: var(--bg-card);
+  border-radius: 6px;
+  animation: pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.45; }
+}
+
+/* ── Leaflet popup styling ───────────────────────────────────── */
+.leaflet-popup-content-wrapper {
+  background: var(--bg-panel) !important;
+  color: var(--text) !important;
+  border: 1px solid var(--border) !important;
+  border-radius: 8px !important;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.5) !important;
+}
+
+.leaflet-popup-tip { background: var(--bg-panel) !important; }
+
+.leaflet-container { font-family: system-ui, sans-serif; }
