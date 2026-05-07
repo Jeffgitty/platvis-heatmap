@@ -117,9 +117,6 @@ async def get_score(
     """Bereken viskans voor één aangeklikte locatie."""
     dist_km = distance_to_coast(lat, lon)
 
-    if dist_km > 60:
-        raise HTTPException(status_code=400, detail="Locatie te ver van de Nederlandse kust")
-
     depth_m = estimate_depth(dist_km)
     dt = datetime.utcnow()
 

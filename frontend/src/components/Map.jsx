@@ -64,18 +64,21 @@ export default function Map({ heatmapData, apiUrl }) {
         }
         const d = await res.json();
         const col = d.score >= 70 ? '#22c55e' : d.score >= 40 ? '#eab308' : '#ef4444';
+        const verWeg = d.dist_km > 50
+          ? `<div style="color:#eab308;font-size:11px">⚠️ ${d.dist_km}km van kust — score indicatief</div>` : '';
         popup.setContent(`
           <div style="font-size:13px;line-height:1.7">
             <div style="font-size:22px;font-weight:800;color:${col}">${Math.round(d.score)}<span style="font-size:13px;color:#94a3b8">/100</span></div>
             🌊 Diepte: <strong>${d.depth_m}m</strong><br/>
             📍 ${d.dist_km}km van kust<br/>
             🌙 Getij: ${TIDE_NL[d.tide?.state] ?? d.tide?.state}<br/>
+            ${verWeg}
             <hr style="border-color:#334155;margin:6px 0"/>
             <span style="font-size:11px;color:#94a3b8">${d.explanation}</span>
           </div>
         `);
       } catch {
-        popup.setContent('<div style="color:#ef4444">Fout bij ophalen data</div>');
+        popup.setContent('<div style="color:#ef4444">⚠️ Server niet bereikbaar — probeer opnieuw</div>');
       }
     });
 
